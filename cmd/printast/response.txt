@@ -1,0 +1,310 @@
+Ast of file 'TEST.md':
+HorizontalRule
+Paragraph
+ Text
+ Strong
+  Text 'Advertisement :)'
+Paragraph
+ Text '-'
+ Strong
+  Text '[pica](https://nodeca.github.io/pica/...'
+ Text '- high quality and fast image\n  res...'
+ Strong
+  Text '[babelfish](https://github.com/nodeca...'
+ Text '- developer friendly\n  i18n with pl...'
+Paragraph
+ Text 'You will like those projects!'
+HorizontalRule
+Heading
+ Text 'h1 Heading 8-)'
+Heading
+ Text 'h2 Heading'
+Heading
+ Text 'h3 Heading'
+Heading
+ Text 'h4 Heading'
+Heading
+ Text 'h5 Heading'
+Heading
+ Text 'h6 Heading'
+Heading
+ Text 'Horizontal Rules'
+HorizontalRule
+HorizontalRule
+HorizontalRule
+Heading
+ Text 'Typographic replacements'
+Paragraph
+ Text 'Enable typographer option to see resu...'
+Paragraph
+ Text '(c) (C) (r) (R) (tm) (TM) (p) (P) +-'
+Paragraph
+ Text 'test.. test... test..... test?..... t...'
+Paragraph
+ Text '!!!!!! ???? ,,  -- ---'
+Paragraph
+ Text '"Smartypants, double quotes" and 'sin...'
+Heading
+ Text 'Emphasis'
+Paragraph
+ Text
+ Strong
+  Text 'This is bold text'
+Paragraph
+ Text
+ Strong
+  Text 'This is bold text'
+Paragraph
+ Text
+ Emph
+  Text 'This is italic text'
+Paragraph
+ Text
+ Emph
+  Text 'This is italic text'
+Paragraph
+ Text
+ Del
+  Text 'Strikethrough'
+Heading
+ Text 'Blockquotes'
+BlockQuote
+ Paragraph
+  Text 'Blockquotes can also be nested...\n> ...'
+Heading
+ Text 'Lists'
+Paragraph
+ Text 'Unordered'
+Paragraph
+ Text '+ Create a list by starting a line wi...'
+ Code '+ "'
+ Text '" +'
+ Code '+'
+ Text '+ "'
+ Code '" +'
+ Text ','
+ Code '+ "'
+ Text '" +'
+ Code '-'
+ Text '+ "'
+ Code '" +'
+ Text ', or'
+ Code '+ "'
+ Text '" +'
+ Code '*'
+ Text '+ "'
+ Code '" +'
+ Text '\n+ Sub-lists are made by indenting 2...'
+Paragraph
+ Text 'Ordered'
+Paragraph
+ Text '1. Lorem ipsum dolor sit amet\n2. Con...'
+Paragraph
+ Text '1. You can use sequential numbers...\...'
+ Code '+ "'
+ Text '" +'
+ Code '1.'
+ Text '+ "'
+ Code '" +'
+Paragraph
+ Text 'Start numbering with offset:'
+Paragraph
+ Text '57. foo\n1. bar'
+Heading
+ Text 'Code'
+Paragraph
+ Text 'Inline'
+ Code '+ "'
+ Text '" +'
+ Code 'code'
+ Text '+ "'
+ Code '" +'
+Paragraph
+ Text 'Indented code'
+Paragraph
+ Text '// Some comments\n    line 1 of code\...'
+Paragraph
+ Text 'Block code "fences"'
+Paragraph
+ Text
+ Code '+ "'
+ Text '" +'
+ Code '+ "`" +'
+ Text '+ "'
+ Code '" +'
+ Text '\nSample text here...\n'
+ Code '+ "'
+ Text '" +'
+ Code '+ "`" +'
+ Text '+ "'
+ Code '" +'
+Paragraph
+ Text 'Syntax highlighting'
+Paragraph
+ Text
+ Code '+ "'
+ Text '" +'
+ Code '+ "`" +'
+ Text '+ "'
+ Code '" +'
+ Text 'js\nvar foo = function (bar) {\n  re...'
+Paragraph
+ Text 'console.log(foo(5));\n'
+ Code '+ "'
+ Text '" +'
+ Code '+ "`" +'
+ Text '+ "'
+ Code '" +'
+Heading
+ Text 'Tables'
+Paragraph
+ Text '| Option | Description |\n| ------ | ...'
+Paragraph
+ Text 'Right aligned columns'
+Paragraph
+ Text '| Option | Description |\n| ------:| ...'
+Heading
+ Text 'Links'
+Paragraph
+ Text
+ Link 'url=http://dev.nodeca.com'
+  Text 'link text'
+Paragraph
+ Text
+ Link 'url=http://nodeca.github.io/pica/demo/'
+  Text 'link with title'
+Paragraph
+ Text 'Autoconverted link'
+ Link 'url=https://github.com/nodeca/pica'
+  Text 'https://github.com/nodeca/pica'
+ Text '(enable linkify to see)'
+Heading
+ Text 'Images'
+Paragraph
+ Text
+ Image 'url=https://octodex.github.com/images/minion.png'
+  Text 'Minion'
+ Text '\n'
+ Image 'url=https://octodex.github.com/images/stormtroopocat.jpg'
+  Text 'Stormtroopocat'
+Paragraph
+ Text 'Like links, Images also have a footno...'
+Paragraph
+ Text
+ Image 'url=https://octodex.github.com/images/dojocat.jpg'
+  Text 'Alt text'
+Paragraph
+ Text 'With a reference later in the documen...'
+Heading
+ Text 'Plugins'
+Paragraph
+ Text 'The killer feature of'
+ Code '+ "'
+ Text '" +'
+ Code 'markdown-it'
+ Text '+ "'
+ Code '" +'
+ Text 'is very effective support of\n'
+ Link 'url=https://www.npmjs.org/browse/keyword/markdown-it-plugin'
+  Text 'syntax plugins'
+ Text '.'
+Heading
+ Text
+ Link 'url=https://github.com/markdown-it/markdown-it-emoji'
+  Text 'Emojies'
+BlockQuote
+ Paragraph
+  Text 'Classic markup: :wink: :crush: :cry: ...'
+Paragraph
+ Text 'see'
+ Link 'url=https://github.com/markdown-it/markdown-it-emoji#change-output'
+  Text 'how to change output'
+ Text 'with twemoji.'
+Heading
+ Text
+ Link 'url=https://github.com/markdown-it/markdown-it-sub'
+  Text 'Subscript'
+ Text '/'
+ Link 'url=https://github.com/markdown-it/markdown-it-sup'
+  Text 'Superscript'
+Paragraph
+ Text '- 19^th^\n- H~2~O'
+Heading
+ Text
+ Link 'url=https://github.com/markdown-it/markdown-it-ins'
+  Text '\<ins>'
+Paragraph
+ Text '++Inserted text++'
+Heading
+ Text
+ Link 'url=https://github.com/markdown-it/markdown-it-mark'
+  Text '\<mark>'
+Paragraph
+ Text '==Marked text=='
+Heading
+ Text
+ Link 'url=https://github.com/markdown-it/markdown-it-footnote'
+  Text 'Footnotes'
+Paragraph
+ Text 'Footnote 1 link[^first].'
+Paragraph
+ Text 'Footnote 2 link[^second].'
+Paragraph
+ Text 'Inline footnote^[Text of inline footn...'
+Paragraph
+ Text 'Duplicated footnote reference[^second].'
+Paragraph
+ Text '[^first]: Footnote'
+ Strong
+  Text 'can have markup'
+Paragraph
+ Text 'and multiple paragraphs.'
+Paragraph
+ Text '[^second]: Footnote text.'
+Heading
+ Text
+ Link 'url=https://github.com/markdown-it/markdown-it-deflist'
+  Text 'Definition lists'
+List 'flags=definition start'
+ ListItem 'flags=definition term has_block start'
+  Paragraph
+   Text 'Term 1'
+ ListItem 'flags=definition has_block'
+  Paragraph
+   Text 'Definition 1\nwith lazy continuation.'
+ ListItem 'flags=definition term has_block'
+  Paragraph
+   Text 'Term 2 with'
+   Emph
+    Text 'inline markup'
+   Text
+ ListItem 'flags=definition has_block end'
+  Paragraph
+   Text 'Definition 2\n\n\n    { some code, pa...'
+Paragraph
+ Text
+ Emph
+  Text 'Compact style:'
+Paragraph
+ Text 'Term 1\n  ~ Definition 1'
+Paragraph
+ Text 'Term 2\n  ~ Definition 2a\n  ~ Defini...'
+Heading
+ Text
+ Link 'url=https://github.com/markdown-it/markdown-it-abbr'
+  Text 'Abbreviations'
+Paragraph
+ Text 'This is HTML abbreviation example.'
+Paragraph
+ Text 'It converts "HTML", but keep intact p...'
+Paragraph
+ Text '*[HTML]: Hyper Text Markup Language'
+Heading
+ Text
+ Link 'url=https://github.com/markdown-it/markdown-it-container'
+  Text 'Custom containers'
+Paragraph
+ Text '::: warning\n'
+ Emph
+  Text 'here be dragons'
+

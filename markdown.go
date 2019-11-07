@@ -5,7 +5,6 @@ import (
 	"io"
 
 	"github.com/gomarkdown/markdown/ast"
-	"github.com/gomarkdown/markdown/html"
 	"github.com/gomarkdown/markdown/parser"
 )
 
@@ -64,22 +63,4 @@ func Render(doc ast.Node, renderer Renderer) []byte {
 	})
 	renderer.RenderFooter(&buf, doc)
 	return buf.Bytes()
-}
-
-// ToHTML converts markdownDoc to HTML.
-//
-// You can optionally pass a parser and renderer. This allows to customize
-// a parser, use a customized html render or use completely custom renderer.
-//
-// If you pass nil for both, we use parser configured with parser.CommonExtensions
-// and html.Renderer configured with html.CommonFlags.
-func ToHTML(markdown []byte, p *parser.Parser, renderer Renderer) []byte {
-	doc := Parse(markdown, p)
-	if renderer == nil {
-		opts := html.RendererOptions{
-			Flags: html.CommonFlags,
-		}
-		renderer = html.NewRenderer(opts)
-	}
-	return Render(doc, renderer)
 }

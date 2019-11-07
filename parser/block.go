@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"html"
 	"regexp"
-	"strconv"
 	"unicode"
 
 	"github.com/gomarkdown/markdown/ast"
@@ -92,263 +91,23 @@ func sanitizeAnchorName(text string) string {
 // the input buffer ends with a newline.
 func (p *Parser) block(data []byte) {
 	// this is called recursively: enforce a maximum depth
-	if p.nesting >= p.maxNesting {
-		return
-	}
-	p.nesting++
-
-	// parse out one block-level construct at a time
 	for len(data) > 0 {
-		// attributes that can be specific before a block element:
-		//
-		// {#id .class1 .class2 key="value"}
-		if p.extensions&Attributes != 0 {
-			data = p.attribute(data)
-		}
-
-		if p.extensions&Includes != 0 {
-			f := p.readInclude
-			path, address, consumed := p.isInclude(data)
-			if consumed == 0 {
-				path, address, consumed = p.isCodeInclude(data)
-				f = p.readCodeInclude
-			}
-			if consumed > 0 {
-				included := f(p.includeStack.Last(), path, address)
-				p.includeStack.Push(path)
-				p.block(included)
-				p.includeStack.Pop()
-				data = data[consumed:]
-				continue
-			}
-		}
-
-		// user supplied parser function
-		if p.Opts.ParserHook != nil {
-			node, blockdata, consumed := p.Opts.ParserHook(data)
-			if consumed > 0 {
-				data = data[consumed:]
-
-				if node != nil {
-					p.addBlock(node)
-					if blockdata != nil {
-						p.block(blockdata)
-						p.finalize(node)
-					}
-				}
-				continue
-			}
-		}
-
-		// prefixed heading:
-		//
-		// # Heading 1
-		// ## Heading 2
-		// ...
-		// ###### Heading 6
-		if p.isPrefixHeading(data) {
-			data = data[p.prefixHeading(data):]
-			continue
-		}
-
-		// prefixed special heading:
-		// (there are no levels.)
-		//
-		// .# Abstract
-		if p.isPrefixSpecialHeading(data) {
-			data = data[p.prefixSpecialHeading(data):]
-			continue
-		}
-
-		// block of preformatted HTML:
-		//
-		// <div>
-		//     ...
-		// </div>
-		if data[0] == '<' {
-			if i := p.html(data, true); i > 0 {
-				data = data[i:]
-				continue
-			}
-		}
-
-		// title block
-		//
-		// % stuff
-		// % more stuff
-		// % even more stuff
-		if p.extensions&Titleblock != 0 {
-			if data[0] == '%' {
-				if i := p.titleBlock(data, true); i > 0 {
-					data = data[i:]
-					continue
-				}
-			}
-		}
-
-		// blank lines.  note: returns the # of bytes to skip
-		if i := p.isEmpty(data); i > 0 {
+		if i := p.fencedCodeBlock(data, true); i > 0 {
 			data = data[i:]
 			continue
 		}
 
-		// indented code block:
-		//
-		//     func max(a, b int) int {
-		//         if a > b {
-		//             return a
-		//         }
-		//         return b
-		//      }
-		if p.codePrefix(data) > 0 {
-			data = data[p.code(data):]
-			continue
-		}
-
-		// fenced code block:
-		//
-		// ``` go
-		// func fact(n int) int {
-		//     if n <= 1 {
-		//         return n
-		//     }
-		//     return n * fact(n-1)
-		// }
-		// ```
-		if p.extensions&FencedCode != 0 {
-			if i := p.fencedCodeBlock(data, true); i > 0 {
-				data = data[i:]
-				continue
-			}
-		}
-
-		// horizontal rule:
-		//
-		// ------
-		// or
-		// ******
-		// or
-		// ______
-		if p.isHRule(data) {
-			p.addBlock(&ast.HorizontalRule{})
-			i := skipUntilChar(data, 0, '\n')
-			data = data[i:]
-			continue
-		}
-
-		// block quote:
-		//
-		// > A big quote I found somewhere
-		// > on the web
 		if p.quotePrefix(data) > 0 {
 			data = data[p.quote(data):]
 			continue
 		}
 
-		// aside:
-		//
-		// A> The proof is too large to fit
-		// A> in the margin.
-		if p.extensions&Mmark != 0 {
-			if p.asidePrefix(data) > 0 {
-				data = data[p.aside(data):]
-				continue
-			}
-		}
-
-		// figure block:
-		//
-		// !---
-		// ![Alt Text](img.jpg "This is an image")
-		// ![Alt Text](img2.jpg "This is a second image")
-		// !---
-		if p.extensions&Mmark != 0 {
-			if i := p.figureBlock(data, true); i > 0 {
-				data = data[i:]
-				continue
-			}
-		}
-
-		// table:
-		//
-		// Name  | Age | Phone
-		// ------|-----|---------
-		// Bob   | 31  | 555-1234
-		// Alice | 27  | 555-4321
-		if p.extensions&Tables != 0 {
-			if i := p.table(data); i > 0 {
-				data = data[i:]
-				continue
-			}
-		}
-
-		// an itemized/unordered list:
-		//
-		// * Item 1
-		// * Item 2
-		//
-		// also works with + or -
-		if p.uliPrefix(data) > 0 {
-			data = data[p.list(data, 0, 0):]
-			continue
-		}
-
-		// a numbered/ordered list:
-		//
-		// 1. Item 1
-		// 2. Item 2
-		if i := p.oliPrefix(data); i > 0 {
-			start := 0
-			if i > 2 && p.extensions&OrderedListStart != 0 {
-				s := string(data[:i-2])
-				start, _ = strconv.Atoi(s)
-				if start == 1 {
-					start = 0
-				}
-			}
-			data = data[p.list(data, ast.ListTypeOrdered, start):]
-			continue
-		}
-
-		// definition lists:
-		//
-		// Term 1
-		// :   Definition a
-		// :   Definition b
-		//
-		// Term 2
-		// :   Definition c
-		if p.extensions&DefinitionLists != 0 {
-			if p.dliPrefix(data) > 0 {
-				data = data[p.list(data, ast.ListTypeDefinition, 0):]
-				continue
-			}
-		}
-
-		if p.extensions&MathJax != 0 {
-			if i := p.blockMath(data); i > 0 {
-				data = data[i:]
-				continue
-			}
-		}
-
-		// document matters:
-		//
-		// {frontmatter}/{mainmatter}/{backmatter}
-		if p.extensions&Mmark != 0 {
-			if i := p.documentMatter(data); i > 0 {
-				data = data[i:]
-				continue
-			}
-		}
-
-		// anything else must look like a normal paragraph
-		// note: this finds underlined headings, too
 		idx := p.paragraph(data)
 		data = data[idx:]
 	}
+	//p.renderParagraph(data)
+	return
 
-	p.nesting--
 }
 
 func (p *Parser) addBlock(n ast.Node) ast.Node {
@@ -367,17 +126,7 @@ func (p *Parser) addBlock(n ast.Node) ast.Node {
 }
 
 func (p *Parser) isPrefixHeading(data []byte) bool {
-	if data[0] != '#' {
-		return false
-	}
-
-	if p.extensions&SpaceHeadings != 0 {
-		level := skipCharN(data, 0, '#', 6)
-		if level == len(data) || data[level] != ' ' {
-			return false
-		}
-	}
-	return true
+	return len(data) > 1 && data[0] == '#' && isSpace(data[1])
 }
 
 func (p *Parser) prefixHeading(data []byte) int {
@@ -385,24 +134,6 @@ func (p *Parser) prefixHeading(data []byte) int {
 	i := skipChar(data, level, ' ')
 	end := skipUntilChar(data, i, '\n')
 	skip := end
-	id := ""
-	if p.extensions&HeadingIDs != 0 {
-		j, k := 0, 0
-		// find start/end of heading id
-		for j = i; j < end-1 && (data[j] != '{' || data[j+1] != '#'); j++ {
-		}
-		for k = j + 1; k < end && data[k] != '}'; k++ {
-		}
-		// extract heading id iff found
-		if j < end && k < end {
-			id = string(data[j+2 : k])
-			end = j
-			skip = k + 1
-			for end > 0 && data[end-1] == ' ' {
-				end--
-			}
-		}
-	}
 	for end > 0 && data[end-1] == '#' {
 		if isBackslashEscaped(data, end-1) {
 			break
@@ -413,23 +144,16 @@ func (p *Parser) prefixHeading(data []byte) int {
 		end--
 	}
 	if end > i {
-		if id == "" && p.extensions&AutoHeadingIDs != 0 {
-			id = sanitizeAnchorName(string(data[i:end]))
-		}
 		block := &ast.Heading{
-			HeadingID: id,
-			Level:     level,
+			Level: level,
 		}
-		block.Content = data[i:end]
+		block.Literal = data[i:end]
 		p.addBlock(block)
 	}
 	return skip
 }
 
 func (p *Parser) isPrefixSpecialHeading(data []byte) bool {
-	if p.extensions|Mmark == 0 {
-		return false
-	}
 	if len(data) < 4 {
 		return false
 	}
@@ -547,203 +271,6 @@ func (p *Parser) titleBlock(data []byte, doRender bool) int {
 	p.addBlock(block)
 
 	return consumed
-}
-
-func (p *Parser) html(data []byte, doRender bool) int {
-	var i, j int
-
-	// identify the opening tag
-	if data[0] != '<' {
-		return 0
-	}
-	curtag, tagfound := p.htmlFindTag(data[1:])
-
-	// handle special cases
-	if !tagfound {
-		// check for an HTML comment
-		if size := p.htmlComment(data, doRender); size > 0 {
-			return size
-		}
-
-		// check for an <hr> tag
-		if size := p.htmlHr(data, doRender); size > 0 {
-			return size
-		}
-
-		// no special case recognized
-		return 0
-	}
-
-	// look for an unindented matching closing tag
-	// followed by a blank line
-	found := false
-	/*
-		closetag := []byte("\n</" + curtag + ">")
-		j = len(curtag) + 1
-		for !found {
-			// scan for a closing tag at the beginning of a line
-			if skip := bytes.Index(data[j:], closetag); skip >= 0 {
-				j += skip + len(closetag)
-			} else {
-				break
-			}
-
-			// see if it is the only thing on the line
-			if skip := p.isEmpty(data[j:]); skip > 0 {
-				// see if it is followed by a blank line/eof
-				j += skip
-				if j >= len(data) {
-					found = true
-					i = j
-				} else {
-					if skip := p.isEmpty(data[j:]); skip > 0 {
-						j += skip
-						found = true
-						i = j
-					}
-				}
-			}
-		}
-	*/
-
-	// if not found, try a second pass looking for indented match
-	// but not if tag is "ins" or "del" (following original Markdown.pl)
-	if !found && curtag != "ins" && curtag != "del" {
-		i = 1
-		for i < len(data) {
-			i++
-			for i < len(data) && !(data[i-1] == '<' && data[i] == '/') {
-				i++
-			}
-
-			if i+2+len(curtag) >= len(data) {
-				break
-			}
-
-			j = p.htmlFindEnd(curtag, data[i-1:])
-
-			if j > 0 {
-				i += j - 1
-				found = true
-				break
-			}
-		}
-	}
-
-	if !found {
-		return 0
-	}
-
-	// the end of the block has been found
-	if doRender {
-		// trim newlines
-		end := backChar(data, i, '\n')
-		htmlBLock := &ast.HTMLBlock{ast.Leaf{Content: data[:end]}}
-		p.addBlock(htmlBLock)
-		finalizeHTMLBlock(htmlBLock)
-	}
-
-	return i
-}
-
-func finalizeHTMLBlock(block *ast.HTMLBlock) {
-	block.Literal = block.Content
-	block.Content = nil
-}
-
-// HTML comment, lax form
-func (p *Parser) htmlComment(data []byte, doRender bool) int {
-	i := p.inlineHTMLComment(data)
-	// needs to end with a blank line
-	if j := p.isEmpty(data[i:]); j > 0 {
-		size := i + j
-		if doRender {
-			// trim trailing newlines
-			end := backChar(data, size, '\n')
-			htmlBLock := &ast.HTMLBlock{ast.Leaf{Content: data[:end]}}
-			p.addBlock(htmlBLock)
-			finalizeHTMLBlock(htmlBLock)
-		}
-		return size
-	}
-	return 0
-}
-
-// HR, which is the only self-closing block tag considered
-func (p *Parser) htmlHr(data []byte, doRender bool) int {
-	if len(data) < 4 {
-		return 0
-	}
-	if data[0] != '<' || (data[1] != 'h' && data[1] != 'H') || (data[2] != 'r' && data[2] != 'R') {
-		return 0
-	}
-	if data[3] != ' ' && data[3] != '/' && data[3] != '>' {
-		// not an <hr> tag after all; at least not a valid one
-		return 0
-	}
-	i := 3
-	for i < len(data) && data[i] != '>' && data[i] != '\n' {
-		i++
-	}
-	if i < len(data) && data[i] == '>' {
-		i++
-		if j := p.isEmpty(data[i:]); j > 0 {
-			size := i + j
-			if doRender {
-				// trim newlines
-				end := backChar(data, size, '\n')
-				htmlBlock := &ast.HTMLBlock{ast.Leaf{Content: data[:end]}}
-				p.addBlock(htmlBlock)
-				finalizeHTMLBlock(htmlBlock)
-			}
-			return size
-		}
-	}
-	return 0
-}
-
-func (p *Parser) htmlFindTag(data []byte) (string, bool) {
-	i := skipAlnum(data, 0)
-	key := string(data[:i])
-	if _, ok := blockTags[key]; ok {
-		return key, true
-	}
-	return "", false
-}
-
-func (p *Parser) htmlFindEnd(tag string, data []byte) int {
-	// assume data[0] == '<' && data[1] == '/' already tested
-	if tag == "hr" {
-		return 2
-	}
-	// check if tag is a match
-	closetag := []byte("</" + tag + ">")
-	if !bytes.HasPrefix(data, closetag) {
-		return 0
-	}
-	i := len(closetag)
-
-	// check that the rest of the line is blank
-	skip := 0
-	if skip = p.isEmpty(data[i:]); skip == 0 {
-		return 0
-	}
-	i += skip
-	skip = 0
-
-	if i >= len(data) {
-		return i
-	}
-
-	if p.extensions&LaxHTMLBlocks != 0 {
-		return i
-	}
-	if skip = p.isEmpty(data[i:]); skip == 0 {
-		// following line must be blank
-		return 0
-	}
-
-	return i + skip
 }
 
 func (*Parser) isEmpty(data []byte) int {
@@ -934,12 +461,6 @@ func (p *Parser) fencedCodeBlock(data []byte, doRender bool) int {
 			IsFenced: true,
 		}
 		codeBlock.Content = work.Bytes() // TODO: get rid of temp buffer
-
-		if p.extensions&Mmark == 0 {
-			p.addBlock(codeBlock)
-			finalizeCodeBlock(codeBlock)
-			return beg
-		}
 
 		// Check for caption and if found make it a figure.
 		if captionContent, id, consumed := p.caption(data[beg:], []byte("Figure: ")); consumed > 0 {
@@ -1283,13 +804,6 @@ func (p *Parser) quote(data []byte) int {
 		// fenced code and if one's found, incorporate it altogether,
 		// irregardless of any contents inside it
 		for end < len(data) && data[end] != '\n' {
-			if p.extensions&FencedCode != 0 {
-				if i := p.fencedCodeBlock(data[end:], false); i > 0 {
-					// -1 to compensate for the extra end++ after the loop:
-					end += i - 1
-					break
-				}
-			}
 			end++
 		}
 		end = skipCharN(data, end, '\n', 1)
@@ -1304,36 +818,9 @@ func (p *Parser) quote(data []byte) int {
 		beg = end
 	}
 
-	if p.extensions&Mmark == 0 {
-		block := p.addBlock(&ast.BlockQuote{})
-		p.block(raw.Bytes())
-		p.finalize(block)
-		return end
-	}
-
-	if captionContent, id, consumed := p.caption(data[end:], []byte("Quote: ")); consumed > 0 {
-		figure := &ast.CaptionFigure{}
-		caption := &ast.Caption{}
-		figure.HeadingID = id
-		p.Inline(caption, captionContent)
-
-		p.addBlock(figure) // this discard any attributes
-		block := &ast.BlockQuote{}
-		block.AsContainer().Attribute = figure.AsContainer().Attribute
-		p.addChild(block)
-		p.block(raw.Bytes())
-		p.finalize(block)
-
-		p.addChild(caption)
-		p.finalize(figure)
-
-		end += consumed
-
-		return end
-	}
-
-	block := p.addBlock(&ast.BlockQuote{})
-	p.block(raw.Bytes())
+	quote := &ast.BlockQuote{}
+	quote.Literal = raw.Bytes()
+	block := p.addBlock(quote)
 	p.finalize(block)
 
 	return end
@@ -1812,14 +1299,6 @@ func (p *Parser) paragraph(data []byte) int {
 
 		// did we find a blank line marking the end of the paragraph?
 		if n := p.isEmpty(current); n > 0 {
-			// did this blank line followed by a definition list item?
-			if p.extensions&DefinitionLists != 0 {
-				if i < len(data)-1 && data[i+1] == ':' {
-					listLen := p.list(data[prev:], ast.ListTypeDefinition, 0)
-					return prev + listLen
-				}
-			}
-
 			p.renderParagraph(data[:i])
 			return i + n
 		}
@@ -1856,51 +1335,9 @@ func (p *Parser) paragraph(data []byte) int {
 			}
 		}
 
-		// if the next line starts a block of HTML, then the paragraph ends here
-		if p.extensions&LaxHTMLBlocks != 0 {
-			if data[i] == '<' && p.html(current, false) > 0 {
-				// rewind to before the HTML block
-				p.renderParagraph(data[:i])
-				return i
-			}
-		}
-
-		// if there's a prefixed heading or a horizontal rule after this, paragraph is over
-		if p.isPrefixHeading(current) || p.isPrefixSpecialHeading(current) || p.isHRule(current) {
-			p.renderParagraph(data[:i])
-			return i
-		}
-
 		// if there's a fenced code block, paragraph is over
 		if p.extensions&FencedCode != 0 {
 			if p.fencedCodeBlock(current, false) > 0 {
-				p.renderParagraph(data[:i])
-				return i
-			}
-		}
-
-		// if there's a figure block, paragraph is over
-		if p.extensions&Mmark != 0 {
-			if p.figureBlock(current, false) > 0 {
-				p.renderParagraph(data[:i])
-				return i
-			}
-		}
-
-		// if there's a definition list item, prev line is a definition term
-		if p.extensions&DefinitionLists != 0 {
-			if p.dliPrefix(current) != 0 {
-				ret := p.list(data[prev:], ast.ListTypeDefinition, 0)
-				return ret + prev
-			}
-		}
-
-		// if there's a list after this, paragraph is over
-		if p.extensions&NoEmptyLineBeforeBlock != 0 {
-			if p.uliPrefix(current) != 0 ||
-				p.oliPrefix(current) != 0 ||
-				p.quotePrefix(current) != 0 ||
-				p.codePrefix(current) != 0 {
 				p.renderParagraph(data[:i])
 				return i
 			}

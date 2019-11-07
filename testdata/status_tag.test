@@ -1,0 +1,44 @@
+nothing inline
++++
+[{"literal":"nothing inline"}]
++++
+simple #tag test
++++
+[{"literal":"simple "},{"type":"status-tag","literal":"tag"},{"literal":" test"}]
++++
+#at-the beginning
++++
+[{"literal":""},{"type":"status-tag","literal":"at-the"},{"literal":" beginning"}]
++++
+at the #end
++++
+[{"literal":"at the "},{"type":"status-tag","literal":"end"}]
++++
+#try-two in #one-line
++++
+[{"literal":""},{"type":"status-tag","literal":"try-two"},{"literal":" in "},{"type":"status-tag","literal":"one-line"}]
++++
+over #two
+lines test
++++
+[{"literal":"over "},{"type":"status-tag","literal":"two"},{"literal":"\\nlines test"}]
++++
+over two\n#lines test
++++
+[{"literal":"over two\\n"},{"type":"status-tag","literal":"lines"},{"literal":" test"}]
++++
+not valid #status_tag
++++
+[{"literal":"not valid #status_tag"}]
++++
+another not valid #status?tag
++++
+[{"literal":"another not valid #status?tag"}]
++++
+empty # status-tag
++++
+[{"literal":"empty # status-tag"}]
++++
+status-tag with #number9
++++
+[{"literal":"status-tag with "},{"type":"status-tag","literal":"number9"}]

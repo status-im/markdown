@@ -5,8 +5,6 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"testing"
-
-	"github.com/gomarkdown/markdown/parser"
 )
 
 type testData struct {
@@ -65,19 +63,4 @@ func readTestFile(t *testing.T, fileName string) []*testData {
 		res = append(res, td)
 	}
 	return res
-}
-
-func TestMmark(t *testing.T) {
-	testData := readTestFile(t, "mmark.test")
-	ext := parser.CommonExtensions | parser.Attributes | parser.OrderedListStart | parser.SuperSubscript | parser.Mmark
-	for _, td := range testData {
-		p := parser.NewWithExtensions(ext)
-
-		got := ToHTML(td.md, p, nil)
-		want := td.html
-
-		if bytes.Compare(got, want) != 0 {
-			t.Errorf("want (%d bytes) %s, got (%d bytes) %s, for input %q", len(want), want, len(got), got, td.md)
-		}
-	}
 }

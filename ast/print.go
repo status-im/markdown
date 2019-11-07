@@ -36,22 +36,12 @@ func ToString(doc Node) string {
 	return buf.String()
 }
 
-func contentToString(d1 []byte, d2 []byte) string {
-	if d1 != nil {
-		return string(d1)
-	}
-	if d2 != nil {
-		return string(d2)
-	}
-	return ""
-}
-
 func getContent(node Node) string {
 	if c := node.AsContainer(); c != nil {
-		return contentToString(c.Literal, c.Content)
+		return string(c.Literal)
 	}
 	leaf := node.AsLeaf()
-	return contentToString(leaf.Literal, leaf.Content)
+	return string(leaf.Literal)
 }
 
 func shortenString(s string, maxLen int) string {
@@ -125,6 +115,9 @@ func printRecur(w io.Writer, node Node, prefix string, depth int) {
 	switch v := node.(type) {
 	case *Link:
 		content := "url=" + string(v.Destination)
+		printDefault(w, indent, typeName, content)
+	case *StatusTag:
+		content := "tag=" + string(v.Literal)
 		printDefault(w, indent, typeName, content)
 	case *Image:
 		content := "url=" + string(v.Destination)

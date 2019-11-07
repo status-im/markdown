@@ -1,5 +1,7 @@
 package ast
 
+import "encoding/json"
+
 // ListType contains bitwise or'ed flags for list and list item objects.
 type ListType int
 
@@ -74,13 +76,28 @@ type Node interface {
 
 // Container is a type of node that can contain children
 type Container struct {
-	Parent   Node
+	Parent   Node `json:"-"`
 	Children []Node
 
 	Literal []byte // Text contents of the leaf nodes
 	Content []byte // Markdown content of the block nodes
 
 	*Attribute // Block level attribute
+}
+
+func (c *Container) MarshalJSON() ([]byte, error) {
+	type ContainerJSON struct {
+		Children []Node `json:"children"`
+		Literal  string `json:"literal"`
+		*Attribute
+	}
+	var c1 ContainerJSON
+	c1.Children = c.Children
+	c1.Literal = string(c.Literal)
+	c1.Attribute = c.Attribute
+
+	return json.Marshal(&c1)
+
 }
 
 // AsContainer returns itself as *Container
@@ -115,12 +132,22 @@ func (c *Container) SetChildren(newChildren []Node) {
 
 // Leaf is a type of node that cannot have children
 type Leaf struct {
-	Parent Node
+	Parent Node `json:"-"`
 
 	Literal []byte // Text contents of the leaf nodes
 	Content []byte // Markdown content of the block nodes
 
 	*Attribute // Block level attribute
+}
+
+func (c *Leaf) MarshalJSON() ([]byte, error) {
+	type LeafJSON struct {
+		Literal string `json:"literal"`
+	}
+	var c1 LeafJSON
+	c1.Literal = string(c.Literal)
+
+	return json.Marshal(&c1)
 }
 
 // AsContainer returns nil
@@ -158,6 +185,14 @@ type Document struct {
 	Container
 }
 
+func (doc *Document) MarshalJSON() ([]byte, error) {
+	children := doc.GetChildren()
+	if len(children) != 0 {
+		return json.Marshal(children)
+	}
+	return []byte("[]"), nil
+}
+
 // DocumentMatter represents markdown node that signals a document
 // division: frontmatter, mainmatter or backmatter.
 type DocumentMatter struct {
@@ -169,6 +204,21 @@ type DocumentMatter struct {
 // BlockQuote represents markdown block quote node
 type BlockQuote struct {
 	Container
+}
+
+func (c *BlockQuote) MarshalJSON() ([]byte, error) {
+	type BlockQuoteJSON struct {
+		Type     string `json:"type"`
+		Children []Node `json:"children"`
+		Literal  string `json:"literal"`
+		*Attribute
+	}
+	var c1 BlockQuoteJSON
+	c1.Children = c.Children
+	c1.Literal = string(c.Literal)
+	c1.Type = "blockquote"
+
+	return json.Marshal(&c1)
 }
 
 // Aside represents an markdown aside node.
@@ -206,6 +256,17 @@ type Paragraph struct {
 	Container
 }
 
+func (c *Paragraph) MarshalJSON() ([]byte, error) {
+	type ParagraphJSON struct {
+		Type     string `json:"type"`
+		Children []Node `json:"children"`
+	}
+	var c1 ParagraphJSON
+	c1.Children = c.Children
+	c1.Type = "paragraph"
+	return json.Marshal(&c1)
+}
+
 // Math represents markdown MathAjax inline node
 type Math struct {
 	Leaf
@@ -226,6 +287,28 @@ type Heading struct {
 	IsSpecial    bool   // We are a special heading (starts with .#)
 }
 
+func (c *Heading) MarshalJSON() ([]byte, error) {
+	type HeadingJSON struct {
+		Type         string `json:"type"`
+		Children     []Node `json:"children"`
+		Literal      string `json:"literal"`
+		Level        int    `json:"level"`
+		IsTitleblock bool   `json:"isTitleBlock"`
+
+		*Attribute
+	}
+	var c1 HeadingJSON
+	c1.Children = c.Children
+	c1.Literal = string(c.Literal)
+	c1.Attribute = c.Attribute
+	c1.Type = "heading"
+	c1.Level = c.Level
+	c1.IsTitleblock = c.IsTitleblock
+
+	return json.Marshal(&c1)
+
+}
+
 // HorizontalRule represents markdown horizontal rule node
 type HorizontalRule struct {
 	Leaf
@@ -233,17 +316,60 @@ type HorizontalRule struct {
 
 // Emph represents markdown emphasis node
 type Emph struct {
-	Container
+	Leaf
+}
+
+func (c *Emph) MarshalJSON() ([]byte, error) {
+	type EmphJSON struct {
+		Type    string `json:"type"`
+		Literal string `json:"literal"`
+		*Attribute
+	}
+	var c1 EmphJSON
+	c1.Literal = string(c.Literal)
+	c1.Attribute = c.Attribute
+	c1.Type = "emph"
+
+	return json.Marshal(&c1)
+}
+
+type StatusTag struct {
+	Leaf
+}
+
+func (c *StatusTag) MarshalJSON() ([]byte, error) {
+	type StatusTagJSON struct {
+		Type    string `json:"type"`
+		Literal string `json:"literal"`
+	}
+	var c1 StatusTagJSON
+	c1.Literal = string(c.Literal)
+	c1.Type = "status-tag"
+	return json.Marshal(&c1)
 }
 
 // Strong represents markdown strong node
 type Strong struct {
-	Container
+	Leaf
+}
+
+func (c *Strong) MarshalJSON() ([]byte, error) {
+	type StrongJSON struct {
+		Type    string `json:"type"`
+		Literal string `json:"literal"`
+		*Attribute
+	}
+	var c1 StrongJSON
+	c1.Literal = string(c.Literal)
+	c1.Attribute = c.Attribute
+	c1.Type = "strong"
+
+	return json.Marshal(&c1)
 }
 
 // Del represents markdown del node
 type Del struct {
-	Container
+	Leaf
 }
 
 // Link represents markdown link node
@@ -255,6 +381,26 @@ type Link struct {
 	NoteID      int    // NoteID contains a serial number of a footnote, zero if it's not a footnote
 	Footnote    Node   // If it's a footnote, this is a direct link to the footnote Node. Otherwise nil.
 	DeferredID  []byte // If a deferred link this holds the original ID.
+}
+
+func (c *Link) MarshalJSON() ([]byte, error) {
+	type LinkJSON struct {
+		Type        string `json:"type"`
+		Children    []Node `json:"children"`
+		Literal     string `json:"literal"`
+		Title       string `json:"title"`
+		Destination string `json:"destination"`
+		*Attribute
+	}
+	var c1 LinkJSON
+	c1.Children = c.Children
+	c1.Literal = string(c.Literal)
+	c1.Attribute = c.Attribute
+	c1.Title = string(c.Title)
+	c1.Destination = string(c.Destination)
+	c1.Type = "link"
+
+	return json.Marshal(&c1)
 }
 
 // CrossReference is a reference node.
@@ -302,6 +448,20 @@ type CodeBlock struct {
 	FenceOffset int
 }
 
+func (c *CodeBlock) MarshalJSON() ([]byte, error) {
+	type CodeBlockJSON struct {
+		Type    string `json:"type"`
+		Literal string `json:"literal"`
+		*Attribute
+	}
+	var c1 CodeBlockJSON
+	c1.Literal = string(c.Literal)
+	c1.Type = "codeblock"
+	c1.Attribute = c.Attribute
+
+	return json.Marshal(&c1)
+}
+
 // Softbreak represents markdown softbreak node
 // Note: not used currently
 type Softbreak struct {
@@ -321,6 +481,18 @@ type NonBlockingSpace struct {
 // Code represents markdown code node
 type Code struct {
 	Leaf
+}
+
+func (c *Code) MarshalJSON() ([]byte, error) {
+	type CodeJSON struct {
+		Type    string `json:"type"`
+		Literal string `json:"literal"`
+	}
+	var c1 CodeJSON
+	c1.Literal = string(c.Literal)
+	c1.Type = "code"
+
+	return json.Marshal(&c1)
 }
 
 // HTMLSpan represents markdown html span node

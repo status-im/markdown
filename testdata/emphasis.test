@@ -1,67 +1,67 @@
 nothing inline
 +++
-<p>nothing inline</p>
+[{"literal":"nothing inline"}]
 +++
 simple *inline* test
 +++
-<p>simple <em>inline</em> test</p>
+[{"literal":"simple "},{"type":"emph","literal":"inline"},{"literal":" test"}]
 +++
 *at the* beginning
 +++
-<p><em>at the</em> beginning</p>
+[{"literal":""},{"type":"emph","literal":"at the"},{"literal":" beginning"}]
 +++
 at the *end*
 +++
-<p>at the <em>end</em></p>
+[{"literal":"at the "},{"type":"emph","literal":"end"}]
 +++
 *try two* in *one line*
 +++
-<p><em>try two</em> in <em>one line</em></p>
+[{"literal":""},{"type":"emph","literal":"try two"},{"literal":" in "},{"type":"emph","literal":"one line"}]
 +++
 over *two\nlines* test
 +++
-<p>over <em>two\nlines</em> test</p>
+[{"literal":"over "},{"type":"emph","literal":"two\\nlines"},{"literal":" test"}]
 +++
 odd *number of* markers* here
 +++
-<p>odd <em>number of</em> markers* here</p>
+[{"literal":"odd "},{"type":"emph","literal":"number of"},{"literal":" markers* here"}]
 +++
 odd *number\nof* markers* here
 +++
-<p>odd <em>number\nof</em> markers* here</p>
+[{"literal":"odd "},{"type":"emph","literal":"number\\nof"},{"literal":" markers* here"}]
 +++
 simple _inline_ test
 +++
-<p>simple <em>inline</em> test</p>
+[{"literal":"simple "},{"type":"emph","literal":"inline"},{"literal":" test"}]
 +++
 _at the_ beginning
 +++
-<p><em>at the</em> beginning</p>
+[{"literal":""},{"type":"emph","literal":"at the"},{"literal":" beginning"}]
 +++
 at the _end_
 +++
-<p>at the <em>end</em></p>
+[{"literal":"at the "},{"type":"emph","literal":"end"}]
 +++
 _try two_ in _one line_
 +++
-<p><em>try two</em> in <em>one line</em></p>
+[{"literal":""},{"type":"emph","literal":"try two"},{"literal":" in "},{"type":"emph","literal":"one line"}]
 +++
 over _two\nlines_ test
 +++
-<p>over <em>two\nlines</em> test</p>
+[{"literal":"over "},{"type":"emph","literal":"two\\nlines"},{"literal":" test"}]
 +++
 odd _number of_ markers_ here
 +++
-<p>odd <em>number of</em> markers_ here</p>
+[{"literal":"odd "},{"type":"emph","literal":"number of"},{"literal":" markers_ here"}]
 +++
 odd _number\nof_ markers_ here
 +++
-<p>odd <em>number\nof</em> markers_ here</p>
+[{"literal":"odd "},{"type":"emph","literal":"number\\nof"},{"literal":" markers_ here"}]
 +++
 mix of *markers_
 +++
-<p>mix of *markers_</p>
+[{"literal":"mix of *markers_"}]
 +++
 *What is A\* algorithm?*
 +++
-<p><em>What is A* algorithm?</em></p>
+[{"literal":""},{"type":"emph","literal":"What is A\\* algorithm?"}]

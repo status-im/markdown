@@ -11,7 +11,7 @@ go get github.com/dvyukov/go-fuzz/go-fuzz-build
 # this step is expensive, so re-use previous runs if possible
 if [ ! -f ./markdown-fuzz.zip ]; then
     mkdir -p fuzz-workdir/corpus
-    cp testdata/*.text fuzz-workdir/corpus
+    cp testdata/*.md fuzz-workdir/corpus
     echo "running go-fuzz-build, might take a while..."
     go-fuzz-build github.com/gomarkdown/markdown
 fi

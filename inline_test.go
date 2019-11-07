@@ -1,12 +1,8 @@
 package markdown
 
 import (
-	"regexp"
 	"testing"
 
-	"strings"
-
-	"github.com/gomarkdown/markdown/html"
 	"github.com/gomarkdown/markdown/parser"
 )
 
@@ -15,7 +11,12 @@ func TestEmphasis(t *testing.T) {
 	doTestsInlineParam(t, tests, TestParams{})
 }
 
-func TestReferenceOverride(t *testing.T) {
+func TestStatusTag(t *testing.T) {
+	tests := readTestFile2(t, "status_tag.test")
+	doTestsInlineParam(t, tests, TestParams{})
+}
+
+func testReferenceOverride(t *testing.T) {
 	var tests = []string{
 		"test [ref1][]\n",
 		"<p>test <a href=\"http://www.ref1.com/\" title=\"Reference 1\">ref1</a></p>\n",
@@ -76,58 +77,61 @@ func TestReferenceOverride(t *testing.T) {
 func TestStrong(t *testing.T) {
 	var tests = []string{
 		"nothing inline\n",
-		"<p>nothing inline</p>\n",
+		"[{\"literal\":\"nothing inline\"}]",
 
 		"simple **inline** test\n",
-		"<p>simple <strong>inline</strong> test</p>\n",
+		"[{\"literal\":\"simple \"},{\"type\":\"strong\",\"literal\":\"inline\"},{\"literal\":\" test\"}]",
+
+		"simple ***triple*** test\n",
+		"[{\"literal\":\"simple \"},{\"type\":\"strong\",\"literal\":\"triple\"},{\"literal\":\" test\"}]",
 
 		"**at the** beginning\n",
-		"<p><strong>at the</strong> beginning</p>\n",
+		"[{\"literal\":\"\"},{\"type\":\"strong\",\"literal\":\"at the\"},{\"literal\":\" beginning\"}]",
 
 		"at the **end**\n",
-		"<p>at the <strong>end</strong></p>\n",
+		"[{\"literal\":\"at the \"},{\"type\":\"strong\",\"literal\":\"end\"}]",
 
 		"**try two** in **one line**\n",
-		"<p><strong>try two</strong> in <strong>one line</strong></p>\n",
+		"[{\"literal\":\"\"},{\"type\":\"strong\",\"literal\":\"try two\"},{\"literal\":\" in \"},{\"type\":\"strong\",\"literal\":\"one line\"}]",
 
 		"over **two\nlines** test\n",
-		"<p>over <strong>two\nlines</strong> test</p>\n",
+		"[{\"literal\":\"over \"},{\"type\":\"strong\",\"literal\":\"two\\nlines\"},{\"literal\":\" test\"}]",
 
 		"odd **number of** markers** here\n",
-		"<p>odd <strong>number of</strong> markers** here</p>\n",
+		"[{\"literal\":\"odd \"},{\"type\":\"strong\",\"literal\":\"number of\"},{\"literal\":\" markers** here\"}]",
 
 		"odd **number\nof** markers** here\n",
-		"<p>odd <strong>number\nof</strong> markers** here</p>\n",
+		"[{\"literal\":\"odd \"},{\"type\":\"strong\",\"literal\":\"number\\nof\"},{\"literal\":\" markers** here\"}]",
 
 		"simple __inline__ test\n",
-		"<p>simple <strong>inline</strong> test</p>\n",
+		"[{\"literal\":\"simple \"},{\"type\":\"strong\",\"literal\":\"inline\"},{\"literal\":\" test\"}]",
 
 		"__at the__ beginning\n",
-		"<p><strong>at the</strong> beginning</p>\n",
+		"[{\"literal\":\"\"},{\"type\":\"strong\",\"literal\":\"at the\"},{\"literal\":\" beginning\"}]",
 
 		"at the __end__\n",
-		"<p>at the <strong>end</strong></p>\n",
+		"[{\"literal\":\"at the \"},{\"type\":\"strong\",\"literal\":\"end\"}]",
 
 		"__try two__ in __one line__\n",
-		"<p><strong>try two</strong> in <strong>one line</strong></p>\n",
+		"[{\"literal\":\"\"},{\"type\":\"strong\",\"literal\":\"try two\"},{\"literal\":\" in \"},{\"type\":\"strong\",\"literal\":\"one line\"}]",
 
 		"over __two\nlines__ test\n",
-		"<p>over <strong>two\nlines</strong> test</p>\n",
+		"[{\"literal\":\"over \"},{\"type\":\"strong\",\"literal\":\"two\\nlines\"},{\"literal\":\" test\"}]",
 
 		"odd __number of__ markers__ here\n",
-		"<p>odd <strong>number of</strong> markers__ here</p>\n",
+		"[{\"literal\":\"odd \"},{\"type\":\"strong\",\"literal\":\"number of\"},{\"literal\":\" markers__ here\"}]",
 
 		"odd __number\nof__ markers__ here\n",
-		"<p>odd <strong>number\nof</strong> markers__ here</p>\n",
+		"[{\"literal\":\"odd \"},{\"type\":\"strong\",\"literal\":\"number\\nof\"},{\"literal\":\" markers__ here\"}]",
 
 		"mix of **markers__\n",
-		"<p>mix of **markers__</p>\n",
+		"[{\"literal\":\"mix of **markers__\"}]",
 
 		"**`/usr`** : this folder is named `usr`\n",
-		"<p><strong><code>/usr</code></strong> : this folder is named <code>usr</code></p>\n",
+		"[{\"literal\":\"\"},{\"type\":\"strong\",\"literal\":\"`/usr`\"},{\"literal\":\" : this folder is named \"},{\"type\":\"code\",\"literal\":\"usr\"}]",
 
 		"**`/usr`** :\n\n this folder is named `usr`\n",
-		"<p><strong><code>/usr</code></strong> :</p>\n\n<p>this folder is named <code>usr</code></p>\n",
+		"[{\"literal\":\"\"},{\"type\":\"strong\",\"literal\":\"`/usr`\"},{\"literal\":\" :\\n\\n this folder is named \"},{\"type\":\"code\",\"literal\":\"usr\"}]",
 	}
 	doTestsInline(t, tests)
 }
@@ -135,12 +139,12 @@ func TestStrong(t *testing.T) {
 func TestStrongShort(t *testing.T) {
 	var tests = []string{
 		"**`/usr`** :\n\n this folder is named `usr`\n",
-		"<p><strong><code>/usr</code></strong> :</p>\n\n<p>this folder is named <code>usr</code></p>\n",
+		"[{\"literal\":\"\"},{\"type\":\"strong\",\"literal\":\"`/usr`\"},{\"literal\":\" :\\n\\n this folder is named \"},{\"type\":\"code\",\"literal\":\"usr\"}]",
 	}
 	doTestsInline(t, tests)
 
 }
-func TestEmphasisMix(t *testing.T) {
+func testEmphasisMix(t *testing.T) {
 	var tests = []string{
 		"***triple emphasis***\n",
 		"<p><strong><em>triple emphasis</em></strong></p>\n",
@@ -169,7 +173,7 @@ func TestEmphasisMix(t *testing.T) {
 	doTestsInline(t, tests)
 }
 
-func TestEmphasisLink(t *testing.T) {
+func testEmphasisLink(t *testing.T) {
 	var tests = []string{
 		"[first](before) *text[second] (inside)text* [third](after)\n",
 		"<p><a href=\"before\">first</a> <em>text<a href=\"inside\">second</a>text</em> <a href=\"after\">third</a></p>\n",
@@ -186,7 +190,7 @@ func TestEmphasisLink(t *testing.T) {
 	doTestsInline(t, tests)
 }
 
-func TestStrikeThrough(t *testing.T) {
+func testStrikeThrough(t *testing.T) {
 	var tests = []string{
 		"nothing inline\n",
 		"<p>nothing inline</p>\n",
@@ -215,7 +219,7 @@ func TestStrikeThrough(t *testing.T) {
 	doTestsInline(t, tests)
 }
 
-func TestCodeSpan(t *testing.T) {
+func testCodeSpan(t *testing.T) {
 	var tests = []string{
 		"`source code`\n",
 		"<p><code>source code</code></p>\n",
@@ -253,7 +257,7 @@ func TestCodeSpan(t *testing.T) {
 	doTestsInline(t, tests)
 }
 
-func TestLineBreak(t *testing.T) {
+func testLineBreak(t *testing.T) {
 	var tests = []string{
 		"this line  \nhas a break\n",
 		"<p>this line<br />\nhas a break</p>\n",
@@ -292,7 +296,7 @@ func TestLineBreak(t *testing.T) {
 		extensions: parser.BackslashLineBreak})
 }
 
-func TestInlineLink(t *testing.T) {
+func testInlineLink(t *testing.T) {
 	var tests = []string{
 		"[foo](/bar/)\n",
 		"<p><a href=\"/bar/\">foo</a></p>\n",
@@ -409,54 +413,7 @@ func TestInlineLink(t *testing.T) {
 
 }
 
-func TestRelAttrLink(t *testing.T) {
-	var nofollowTests = []string{
-		"[foo](http://bar.com/foo/)\n",
-		"<p><a href=\"http://bar.com/foo/\" rel=\"nofollow\">foo</a></p>\n",
-
-		"[foo](/bar/)\n",
-		"<p><a href=\"/bar/\">foo</a></p>\n",
-
-		"[foo](/)\n",
-		"<p><a href=\"/\">foo</a></p>\n",
-
-		"[foo](./)\n",
-		"<p><a href=\"./\">foo</a></p>\n",
-
-		"[foo](../)\n",
-		"<p><a href=\"../\">foo</a></p>\n",
-
-		"[foo](../bar)\n",
-		"<p><a href=\"../bar\">foo</a></p>\n",
-	}
-	doTestsInlineParam(t, nofollowTests, TestParams{
-		Flags: html.Safelink | html.NofollowLinks,
-	})
-
-	var noreferrerTests = []string{
-		"[foo](http://bar.com/foo/)\n",
-		"<p><a href=\"http://bar.com/foo/\" rel=\"noreferrer\">foo</a></p>\n",
-
-		"[foo](/bar/)\n",
-		"<p><a href=\"/bar/\">foo</a></p>\n",
-	}
-	doTestsInlineParam(t, noreferrerTests, TestParams{
-		Flags: html.Safelink | html.NoreferrerLinks,
-	})
-
-	var nofollownoreferrerTests = []string{
-		"[foo](http://bar.com/foo/)\n",
-		"<p><a href=\"http://bar.com/foo/\" rel=\"nofollow noreferrer\">foo</a></p>\n",
-
-		"[foo](/bar/)\n",
-		"<p><a href=\"/bar/\">foo</a></p>\n",
-	}
-	doTestsInlineParam(t, nofollownoreferrerTests, TestParams{
-		Flags: html.Safelink | html.NofollowLinks | html.NoreferrerLinks,
-	})
-}
-
-func TestHrefTargetBlank(t *testing.T) {
+func testHrefTargetBlank(t *testing.T) {
 	var tests = []string{
 		// internal link
 		"[foo](/bar/)\n",
@@ -480,12 +437,10 @@ func TestHrefTargetBlank(t *testing.T) {
 		"[foo](http://example.com)\n",
 		"<p><a href=\"http://example.com\" target=\"_blank\">foo</a></p>\n",
 	}
-	doTestsInlineParam(t, tests, TestParams{
-		Flags: html.Safelink | html.HrefTargetBlank,
-	})
+	doTestsInlineParam(t, tests, TestParams{})
 }
 
-func TestSafeInlineLink(t *testing.T) {
+func testSafeInlineLink(t *testing.T) {
 	var tests = []string{
 		"[foo](/bar/)\n",
 		"<p><a href=\"/bar/\">foo</a></p>\n",
@@ -518,7 +473,7 @@ func TestSafeInlineLink(t *testing.T) {
 	doSafeTestsInline(t, tests)
 }
 
-func TestReferenceLink(t *testing.T) {
+func testReferenceLink(t *testing.T) {
 	var tests = []string{
 		"[link][ref]\n",
 		"<p>[link][ref]</p>\n",
@@ -556,7 +511,7 @@ func TestReferenceLink(t *testing.T) {
 	doLinkTestsInline(t, tests)
 }
 
-func TestTags(t *testing.T) {
+func testTags(t *testing.T) {
 	var tests = []string{
 		"a <span>tag</span>\n",
 		"<p>a <span>tag</span></p>\n",
@@ -573,7 +528,7 @@ func TestTags(t *testing.T) {
 	doTestsInline(t, tests)
 }
 
-func TestAutoLink(t *testing.T) {
+func testAutoLink(t *testing.T) {
 	var tests = []string{
 		"http://foo.com/\n",
 		"<p><a href=\"http://foo.com/\">http://foo.com/</a></p>\n",
@@ -899,128 +854,7 @@ what happens here
 `,
 }
 
-func TestFootnotes(t *testing.T) {
-	doTestsInlineParam(t, footnoteTests, TestParams{
-		extensions: parser.Footnotes,
-	})
-}
-
-func TestFootnotesWithParameters(t *testing.T) {
-	tests := make([]string, len(footnoteTests))
-
-	prefix := "testPrefix"
-	returnText := "ret"
-	re := regexp.MustCompile(`(?ms)<li id="fn:(\S+?)">(.*?)</li>`)
-
-	// Transform the test expectations to match the parameters we're using.
-	for i, test := range footnoteTests {
-		if i%2 == 1 {
-			test = strings.Replace(test, "fn:", "fn:"+prefix, -1)
-			test = strings.Replace(test, "fnref:", "fnref:"+prefix, -1)
-			test = re.ReplaceAllString(test, `<li id="fn:$1">$2 <a class="footnote-return" href="#fnref:$1">ret</a></li>`)
-		}
-		tests[i] = test
-	}
-
-	params := html.RendererOptions{
-		FootnoteAnchorPrefix:       prefix,
-		FootnoteReturnLinkContents: returnText,
-	}
-
-	doTestsInlineParam(t, tests, TestParams{
-		extensions:      parser.Footnotes,
-		Flags:           html.FootnoteReturnLinks,
-		RendererOptions: params,
-	})
-}
-
-func TestNestedFootnotes(t *testing.T) {
-	var tests = []string{
-		`Paragraph.[^fn1]
-
-[^fn1]:
-  Asterisk[^fn2]
-
-[^fn2]:
-  Obelisk`,
-		`<p>Paragraph.<sup class="footnote-ref" id="fnref:fn1"><a href="#fn:fn1">1</a></sup></p>
-
-<div class="footnotes">
-
-<hr />
-
-<ol>
-<li id="fn:fn1">Asterisk<sup class="footnote-ref" id="fnref:fn2"><a href="#fn:fn2">2</a></sup></li>
-
-<li id="fn:fn2">Obelisk</li>
-</ol>
-
-</div>
-`,
-		`This uses footnote A.[^A]
-
-This uses footnote C.[^C]
-
-[^A]:
-  A note. use itself.[^A]
-[^B]:
-  B note, uses A to test duplicate.[^A]
-[^C]:
-  C note, uses B.[^B]
-`,
-
-		`<p>This uses footnote A.<sup class="footnote-ref" id="fnref:A"><a href="#fn:A">1</a></sup></p>
-
-<p>This uses footnote C.<sup class="footnote-ref" id="fnref:C"><a href="#fn:C">2</a></sup></p>
-
-<div class="footnotes">
-
-<hr />
-
-<ol>
-<li id="fn:A">A note. use itself.<sup class="footnote-ref" id="fnref:A"><a href="#fn:A">1</a></sup></li>
-
-<li id="fn:C">C note, uses B.<sup class="footnote-ref" id="fnref:B"><a href="#fn:B">3</a></sup></li>
-
-<li id="fn:B">B note, uses A to test duplicate.<sup class="footnote-ref" id="fnref:A"><a href="#fn:A">1</a></sup></li>
-</ol>
-
-</div>
-`,
-	}
-	doTestsInlineParam(t, tests, TestParams{extensions: parser.Footnotes})
-}
-
-func TestInlineComments(t *testing.T) {
-	var tests = []string{
-		"Hello <!-- there ->\n",
-		"<p>Hello &lt;!&mdash; there &ndash;&gt;</p>\n",
-
-		"Hello <!-- there -->\n",
-		"<p>Hello <!-- there --></p>\n",
-
-		"Hello <!-- there -->",
-		"<p>Hello <!-- there --></p>\n",
-
-		"Hello <!---->\n",
-		"<p>Hello <!----></p>\n",
-
-		"Hello <!-- there -->\na",
-		"<p>Hello <!-- there -->\na</p>\n",
-
-		"* list <!-- item -->\n",
-		"<ul>\n<li>list <!-- item --></li>\n</ul>\n",
-
-		"<!-- Front --> comment\n",
-		"<p><!-- Front --> comment</p>\n",
-
-		"blahblah\n<!--- foo -->\nrhubarb\n",
-		"<p>blahblah\n<!--- foo -->\nrhubarb</p>\n",
-	}
-	doTestsInlineParam(t, tests, TestParams{Flags: html.Smartypants | html.SmartypantsDashes})
-}
-
-func TestSmartDoubleQuotes(t *testing.T) {
+func testSmartDoubleQuotes(t *testing.T) {
 	var tests = []string{
 		"this should be normal \"quoted\" text.\n",
 		"<p>this should be normal &ldquo;quoted&rdquo; text.</p>\n",
@@ -1029,10 +863,10 @@ func TestSmartDoubleQuotes(t *testing.T) {
 		"two pair of \"some\" quoted \"text\".\n",
 		"<p>two pair of &ldquo;some&rdquo; quoted &ldquo;text&rdquo;.</p>\n"}
 
-	doTestsInlineParam(t, tests, TestParams{Flags: html.Smartypants})
+	doTestsInlineParam(t, tests, TestParams{})
 }
 
-func TestSmartDoubleQuotesNBSP(t *testing.T) {
+func testSmartDoubleQuotesNBSP(t *testing.T) {
 	var tests = []string{
 		"this should be normal \"quoted\" text.\n",
 		"<p>this should be normal &ldquo;&nbsp;quoted&nbsp;&rdquo; text.</p>\n",
@@ -1041,10 +875,10 @@ func TestSmartDoubleQuotesNBSP(t *testing.T) {
 		"two pair of \"some\" quoted \"text\".\n",
 		"<p>two pair of &ldquo;&nbsp;some&nbsp;&rdquo; quoted &ldquo;&nbsp;text&nbsp;&rdquo;.</p>\n"}
 
-	doTestsInlineParam(t, tests, TestParams{Flags: html.Smartypants | html.SmartypantsQuotesNBSP})
+	doTestsInlineParam(t, tests, TestParams{})
 }
 
-func TestSmartAngledDoubleQuotes(t *testing.T) {
+func testSmartAngledDoubleQuotes(t *testing.T) {
 	var tests = []string{
 		"this should be angled \"quoted\" text.\n",
 		"<p>this should be angled &laquo;quoted&raquo; text.</p>\n",
@@ -1053,40 +887,10 @@ func TestSmartAngledDoubleQuotes(t *testing.T) {
 		"two pair of \"some\" quoted \"text\".\n",
 		"<p>two pair of &laquo;some&raquo; quoted &laquo;text&raquo;.</p>\n"}
 
-	doTestsInlineParam(t, tests, TestParams{Flags: html.Smartypants | html.SmartypantsAngledQuotes})
+	doTestsInlineParam(t, tests, TestParams{})
 }
 
-func TestSmartAngledDoubleQuotesNBSP(t *testing.T) {
-	var tests = []string{
-		"this should be angled \"quoted\" text.\n",
-		"<p>this should be angled &laquo;&nbsp;quoted&nbsp;&raquo; text.</p>\n",
-		"this \" single double\n",
-		"<p>this &laquo;&nbsp; single double</p>\n",
-		"two pair of \"some\" quoted \"text\".\n",
-		"<p>two pair of &laquo;&nbsp;some&nbsp;&raquo; quoted &laquo;&nbsp;text&nbsp;&raquo;.</p>\n"}
-
-	doTestsInlineParam(t, tests, TestParams{Flags: html.Smartypants | html.SmartypantsAngledQuotes | html.SmartypantsQuotesNBSP})
-}
-
-func TestSmartFractions(t *testing.T) {
-	var tests = []string{
-		"1/2, 1/4 and 3/4; 1/4th and 3/4ths\n",
-		"<p>&frac12;, &frac14; and &frac34;; &frac14;th and &frac34;ths</p>\n",
-		"1/2/2015, 1/4/2015, 3/4/2015; 2015/1/2, 2015/1/4, 2015/3/4.\n",
-		"<p>1/2/2015, 1/4/2015, 3/4/2015; 2015/1/2, 2015/1/4, 2015/3/4.</p>\n"}
-
-	doTestsInlineParam(t, tests, TestParams{Flags: html.Smartypants})
-
-	tests = []string{
-		"1/2, 2/3, 81/100 and 1000000/1048576.\n",
-		"<p><sup>1</sup>&frasl;<sub>2</sub>, <sup>2</sup>&frasl;<sub>3</sub>, <sup>81</sup>&frasl;<sub>100</sub> and <sup>1000000</sup>&frasl;<sub>1048576</sub>.</p>\n",
-		"1/2/2015, 1/4/2015, 3/4/2015; 2015/1/2, 2015/1/4, 2015/3/4.\n",
-		"<p>1/2/2015, 1/4/2015, 3/4/2015; 2015/1/2, 2015/1/4, 2015/3/4.</p>\n"}
-
-	doTestsInlineParam(t, tests, TestParams{Flags: html.Smartypants | html.SmartypantsFractions})
-}
-
-func TestDisableSmartDashes(t *testing.T) {
+func testDisableSmartDashes(t *testing.T) {
 	doTestsInlineParam(t, []string{
 		"foo - bar\n",
 		"<p>foo - bar</p>\n",
@@ -1102,7 +906,7 @@ func TestDisableSmartDashes(t *testing.T) {
 		"<p>foo &mdash; bar</p>\n",
 		"foo --- bar\n",
 		"<p>foo &mdash;&ndash; bar</p>\n",
-	}, TestParams{Flags: html.Smartypants | html.SmartypantsDashes})
+	}, TestParams{})
 	doTestsInlineParam(t, []string{
 		"foo - bar\n",
 		"<p>foo - bar</p>\n",
@@ -1110,7 +914,7 @@ func TestDisableSmartDashes(t *testing.T) {
 		"<p>foo &ndash; bar</p>\n",
 		"foo --- bar\n",
 		"<p>foo &mdash; bar</p>\n",
-	}, TestParams{Flags: html.Smartypants | html.SmartypantsLatexDashes | html.SmartypantsDashes})
+	}, TestParams{})
 	doTestsInlineParam(t, []string{
 		"foo - bar\n",
 		"<p>foo - bar</p>\n",
@@ -1118,31 +922,27 @@ func TestDisableSmartDashes(t *testing.T) {
 		"<p>foo -- bar</p>\n",
 		"foo --- bar\n",
 		"<p>foo --- bar</p>\n",
-	}, TestParams{Flags: html.Smartypants | html.SmartypantsLatexDashes})
+	}, TestParams{})
 }
 
-func TestSkipLinks(t *testing.T) {
+func testSkipLinks(t *testing.T) {
 	doTestsInlineParam(t, []string{
 		"[foo](gopher://foo.bar)",
 		"<p><tt>foo</tt></p>\n",
 
 		"[foo](mailto://bar/)\n",
 		"<p><tt>foo</tt></p>\n",
-	}, TestParams{
-		Flags: html.SkipLinks,
-	})
+	}, TestParams{})
 }
 
-func TestSkipImages(t *testing.T) {
+func testSkipImages(t *testing.T) {
 	doTestsInlineParam(t, []string{
 		"![foo](/bar/)\n",
 		"<p></p>\n",
-	}, TestParams{
-		Flags: html.SkipImages,
-	})
+	}, TestParams{})
 }
 
-func TestUseXHTML(t *testing.T) {
+func testUseXHTML(t *testing.T) {
 	doTestsParam(t, []string{
 		"---",
 		"<hr>\n",
@@ -1150,33 +950,15 @@ func TestUseXHTML(t *testing.T) {
 	doTestsParam(t, []string{
 		"---",
 		"<hr />\n",
-	}, TestParams{Flags: html.UseXHTML})
+	}, TestParams{})
 }
 
-func TestSkipHTML(t *testing.T) {
+func testSkipHTML(t *testing.T) {
 	doTestsParam(t, []string{
 		"<div class=\"foo\"></div>\n\ntext\n\n<form>the form</form>",
 		"<p>text</p>\n\n<p>the form</p>\n",
 
 		"text <em>inline html</em> more text",
 		"<p>text inline html more text</p>\n",
-	}, TestParams{Flags: html.SkipHTML})
-}
-
-func TestInlineMath(t *testing.T) {
-	doTestsParam(t, []string{
-		"$a_b$",
-		`<p><span class="math inline">\(a_b\)</span></p>
-`,
-	}, TestParams{Flags: html.SkipHTML, extensions: parser.CommonExtensions})
-}
-
-func BenchmarkSmartDoubleQuotes(b *testing.B) {
-	params := TestParams{Flags: html.Smartypants}
-	params.extensions |= parser.Autolink | parser.Strikethrough
-	params.Flags |= html.UseXHTML
-
-	for i := 0; i < b.N; i++ {
-		runMarkdown("this should be normal \"quoted\" text.\n", params)
-	}
+	}, TestParams{})
 }
