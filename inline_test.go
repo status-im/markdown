@@ -16,6 +16,11 @@ func TestStatusTag(t *testing.T) {
 	doTestsInlineParam(t, tests, TestParams{})
 }
 
+func TestMention(t *testing.T) {
+	tests := readTestFile2(t, "mentions.test")
+	doTestsInlineParam(t, tests, TestParams{})
+}
+
 func testReferenceOverride(t *testing.T) {
 	var tests = []string{
 		"test [ref1][]\n",
@@ -77,61 +82,61 @@ func testReferenceOverride(t *testing.T) {
 func TestStrong(t *testing.T) {
 	var tests = []string{
 		"nothing inline\n",
-		"[{\"literal\":\"nothing inline\"}]",
+		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"nothing inline\"}]}]",
 
 		"simple **inline** test\n",
-		"[{\"literal\":\"simple \"},{\"type\":\"strong\",\"literal\":\"inline\"},{\"literal\":\" test\"}]",
+		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"simple \"},{\"type\":\"strong\",\"literal\":\"inline\"},{\"literal\":\" test\"}]}]",
 
 		"simple ***triple*** test\n",
-		"[{\"literal\":\"simple \"},{\"type\":\"strong\",\"literal\":\"triple\"},{\"literal\":\" test\"}]",
+		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"simple \"},{\"type\":\"strong\",\"literal\":\"triple\"},{\"literal\":\" test\"}]}]",
 
 		"**at the** beginning\n",
-		"[{\"literal\":\"\"},{\"type\":\"strong\",\"literal\":\"at the\"},{\"literal\":\" beginning\"}]",
+		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"\"},{\"type\":\"strong\",\"literal\":\"at the\"},{\"literal\":\" beginning\"}]}]",
 
 		"at the **end**\n",
-		"[{\"literal\":\"at the \"},{\"type\":\"strong\",\"literal\":\"end\"}]",
+		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"at the \"},{\"type\":\"strong\",\"literal\":\"end\"}]}]",
 
 		"**try two** in **one line**\n",
-		"[{\"literal\":\"\"},{\"type\":\"strong\",\"literal\":\"try two\"},{\"literal\":\" in \"},{\"type\":\"strong\",\"literal\":\"one line\"}]",
+		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"\"},{\"type\":\"strong\",\"literal\":\"try two\"},{\"literal\":\" in \"},{\"type\":\"strong\",\"literal\":\"one line\"}]}]",
 
 		"over **two\nlines** test\n",
-		"[{\"literal\":\"over \"},{\"type\":\"strong\",\"literal\":\"two\\nlines\"},{\"literal\":\" test\"}]",
+		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"over \"},{\"type\":\"strong\",\"literal\":\"two\\nlines\"},{\"literal\":\" test\"}]}]",
 
 		"odd **number of** markers** here\n",
-		"[{\"literal\":\"odd \"},{\"type\":\"strong\",\"literal\":\"number of\"},{\"literal\":\" markers** here\"}]",
+		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"odd \"},{\"type\":\"strong\",\"literal\":\"number of\"},{\"literal\":\" markers** here\"}]}]",
 
 		"odd **number\nof** markers** here\n",
-		"[{\"literal\":\"odd \"},{\"type\":\"strong\",\"literal\":\"number\\nof\"},{\"literal\":\" markers** here\"}]",
+		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"odd \"},{\"type\":\"strong\",\"literal\":\"number\\nof\"},{\"literal\":\" markers** here\"}]}]",
 
 		"simple __inline__ test\n",
-		"[{\"literal\":\"simple \"},{\"type\":\"strong\",\"literal\":\"inline\"},{\"literal\":\" test\"}]",
+		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"simple \"},{\"type\":\"strong\",\"literal\":\"inline\"},{\"literal\":\" test\"}]}]",
 
 		"__at the__ beginning\n",
-		"[{\"literal\":\"\"},{\"type\":\"strong\",\"literal\":\"at the\"},{\"literal\":\" beginning\"}]",
+		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"\"},{\"type\":\"strong\",\"literal\":\"at the\"},{\"literal\":\" beginning\"}]}]",
 
 		"at the __end__\n",
-		"[{\"literal\":\"at the \"},{\"type\":\"strong\",\"literal\":\"end\"}]",
+		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"at the \"},{\"type\":\"strong\",\"literal\":\"end\"}]}]",
 
 		"__try two__ in __one line__\n",
-		"[{\"literal\":\"\"},{\"type\":\"strong\",\"literal\":\"try two\"},{\"literal\":\" in \"},{\"type\":\"strong\",\"literal\":\"one line\"}]",
+		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"\"},{\"type\":\"strong\",\"literal\":\"try two\"},{\"literal\":\" in \"},{\"type\":\"strong\",\"literal\":\"one line\"}]}]",
 
 		"over __two\nlines__ test\n",
-		"[{\"literal\":\"over \"},{\"type\":\"strong\",\"literal\":\"two\\nlines\"},{\"literal\":\" test\"}]",
+		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"over \"},{\"type\":\"strong\",\"literal\":\"two\\nlines\"},{\"literal\":\" test\"}]}]",
 
 		"odd __number of__ markers__ here\n",
-		"[{\"literal\":\"odd \"},{\"type\":\"strong\",\"literal\":\"number of\"},{\"literal\":\" markers__ here\"}]",
+		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"odd \"},{\"type\":\"strong\",\"literal\":\"number of\"},{\"literal\":\" markers__ here\"}]}]",
 
 		"odd __number\nof__ markers__ here\n",
-		"[{\"literal\":\"odd \"},{\"type\":\"strong\",\"literal\":\"number\\nof\"},{\"literal\":\" markers__ here\"}]",
+		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"odd \"},{\"type\":\"strong\",\"literal\":\"number\\nof\"},{\"literal\":\" markers__ here\"}]}]",
 
 		"mix of **markers__\n",
-		"[{\"literal\":\"mix of **markers__\"}]",
+		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"mix of **markers__\"}]}]",
 
 		"**`/usr`** : this folder is named `usr`\n",
-		"[{\"literal\":\"\"},{\"type\":\"strong\",\"literal\":\"`/usr`\"},{\"literal\":\" : this folder is named \"},{\"type\":\"code\",\"literal\":\"usr\"}]",
+		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"\"},{\"type\":\"strong\",\"literal\":\"`/usr`\"},{\"literal\":\" : this folder is named \"},{\"type\":\"code\",\"literal\":\"usr\"}]}]",
 
 		"**`/usr`** :\n\n this folder is named `usr`\n",
-		"[{\"literal\":\"\"},{\"type\":\"strong\",\"literal\":\"`/usr`\"},{\"literal\":\" :\\n\\n this folder is named \"},{\"type\":\"code\",\"literal\":\"usr\"}]",
+		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"\"},{\"type\":\"strong\",\"literal\":\"`/usr`\"},{\"literal\":\" :\"}]},{\"type\":\"paragraph\",\"children\":[{\"literal\":\"this folder is named \"},{\"type\":\"code\",\"literal\":\"usr\"}]}]",
 	}
 	doTestsInline(t, tests)
 }
@@ -139,7 +144,7 @@ func TestStrong(t *testing.T) {
 func TestStrongShort(t *testing.T) {
 	var tests = []string{
 		"**`/usr`** :\n\n this folder is named `usr`\n",
-		"[{\"literal\":\"\"},{\"type\":\"strong\",\"literal\":\"`/usr`\"},{\"literal\":\" :\\n\\n this folder is named \"},{\"type\":\"code\",\"literal\":\"usr\"}]",
+		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"\"},{\"type\":\"strong\",\"literal\":\"`/usr`\"},{\"literal\":\" :\"}]},{\"type\":\"paragraph\",\"children\":[{\"literal\":\"this folder is named \"},{\"type\":\"code\",\"literal\":\"usr\"}]}]",
 	}
 	doTestsInline(t, tests)
 
