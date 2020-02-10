@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gomarkdown/markdown"
+	"github.com/status-im/markdown"
 )
 
 func main() {

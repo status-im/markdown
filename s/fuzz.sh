@@ -13,7 +13,7 @@ if [ ! -f ./markdown-fuzz.zip ]; then
     mkdir -p fuzz-workdir/corpus
     cp testdata/*.md fuzz-workdir/corpus
     echo "running go-fuzz-build, might take a while..."
-    go-fuzz-build github.com/gomarkdown/markdown
+    go-fuzz-build github.com/status-im/markdown
 fi
 
 echo "running go-fuzz"

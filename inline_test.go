@@ -3,7 +3,7 @@ package markdown
 import (
 	"testing"
 
-	"github.com/gomarkdown/markdown/parser"
+	"github.com/status-im/markdown/parser"
 )
 
 func TestEmphasis(t *testing.T) {

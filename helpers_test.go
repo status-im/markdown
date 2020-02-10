@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gomarkdown/markdown/parser"
+	"github.com/status-im/markdown/parser"
 )
 
 type TestParams struct {
