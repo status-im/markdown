@@ -88,7 +88,7 @@ func TestStrong(t *testing.T) {
 		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"simple \"},{\"type\":\"strong\",\"literal\":\"inline\"},{\"literal\":\" test\"}]}]",
 
 		"simple ***triple*** test\n",
-		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"simple \"},{\"type\":\"strong\",\"literal\":\"triple\"},{\"literal\":\" test\"}]}]",
+		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"simple \"},{\"type\":\"strong-emph\",\"literal\":\"triple\"},{\"literal\":\" test\"}]}]",
 
 		"**at the** beginning\n",
 		"[{\"type\":\"paragraph\",\"children\":[{\"literal\":\"\"},{\"type\":\"strong\",\"literal\":\"at the\"},{\"literal\":\" beginning\"}]}]",
