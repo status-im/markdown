@@ -39,6 +39,10 @@ empty # status-tag
 +++
 [{"type":"paragraph","children":[{"literal":"empty # status-tag"}]}]
 +++
+empty #sTatus-tag
++++
+[{"type":"paragraph","children":[{"literal":"empty #sTatus-tag"}]}]
++++
 status-tag with #number9
 +++
 [{"type":"paragraph","children":[{"literal":"status-tag with "},{"type":"status-tag","literal":"number9"}]}]
