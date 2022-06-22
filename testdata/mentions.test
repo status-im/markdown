@@ -41,3 +41,47 @@ Invalid char @0x0n24a68f89ba5fcd5e0640c1e1f591d561fa4125ca4e2a43592bc4123eca10ce
 Not starting with 0x @0f0424a68f89ba5fcd5e0640c1e1f591d561fa4125ca4e2a43592bc4123eca10ce064e522c254bb83079ba404327f6eafc01ec90a1444331fe769d3f3a7f90b0dde1
 +++
 [{"type":"paragraph","children":[{"literal":"Not starting with 0x @0f0424a68f89ba5fcd5e0640c1e1f591d561fa4125ca4e2a43592bc4123eca10ce064e522c254bb83079ba404327f6eafc01ec90a1444331fe769d3f3a7f90b0dde1"}]}]
++++
+Valid pk at the end @zQ3shh7B7RWHqbcFxZXwG9H9qnproDSvcCwqmSMzdwrvzN2jf
++++
+[{"type":"paragraph","children":[{"literal":"Valid pk at the end "},{"type":"mention","literal":"zQ3shh7B7RWHqbcFxZXwG9H9qnproDSvcCwqmSMzdwrvzN2jf"}]}]
++++
+Valid pk comma @zQ3shh7B7RWHqbcFxZXwG9H9qnproDSvcCwqmSMzdwrvzN2jf,
++++
+[{"type":"paragraph","children":[{"literal":"Valid pk comma "},{"type":"mention","literal":"zQ3shh7B7RWHqbcFxZXwG9H9qnproDSvcCwqmSMzdwrvzN2jf"},{"literal":","}]}]
++++
+Valid pk dot @zQ3shh7B7RWHqbcFxZXwG9H9qnproDSvcCwqmSMzdwrvzN2jf.
++++
+[{"type":"paragraph","children":[{"literal":"Valid pk dot "},{"type":"mention","literal":"zQ3shh7B7RWHqbcFxZXwG9H9qnproDSvcCwqmSMzdwrvzN2jf"},{"literal":"."}]}]
++++
+Valid pk colon @zQ3shh7B7RWHqbcFxZXwG9H9qnproDSvcCwqmSMzdwrvzN2jf:
++++
+[{"type":"paragraph","children":[{"literal":"Valid pk colon "},{"type":"mention","literal":"zQ3shh7B7RWHqbcFxZXwG9H9qnproDSvcCwqmSMzdwrvzN2jf"},{"literal":":"}]}]
++++
+Valid pk semi-colon @zQ3shh7B7RWHqbcFxZXwG9H9qnproDSvcCwqmSMzdwrvzN2jf;
++++
+[{"type":"paragraph","children":[{"literal":"Valid pk semi-colon "},{"type":"mention","literal":"zQ3shh7B7RWHqbcFxZXwG9H9qnproDSvcCwqmSMzdwrvzN2jf"},{"literal":";"}]}]
++++
+@zQ3shh7B7RWHqbcFxZXwG9H9qnproDSvcCwqmSMzdwrvzN2jf at the beginning
++++
+[{"type":"paragraph","children":[{"literal":""},{"type":"mention","literal":"zQ3shh7B7RWHqbcFxZXwG9H9qnproDSvcCwqmSMzdwrvzN2jf"},{"literal":" at the beginning"}]}]
++++
+in the middle @zQ3shh7B7RWHqbcFxZXwG9H9qnproDSvcCwqmSMzdwrvzN2jf middle
++++
+[{"type":"paragraph","children":[{"literal":"in the middle "},{"type":"mention","literal":"zQ3shh7B7RWHqbcFxZXwG9H9qnproDSvcCwqmSMzdwrvzN2jf"},{"literal":" middle"}]}]
++++
+too short @zQ3shh7B7RWHqbcFxZXwG9H9qnproDSvcCwqmSMzdwrvzN2
++++
+[{"type":"paragraph","children":[{"literal":"too short @zQ3shh7B7RWHqbcFxZXwG9H9qnproDSvcCwqmSMzdwrvzN2"}]}]
++++
+too long @zQ3shh7B7RWHqbcFxZXwG9H9qnproDSvcCwqmSMzdwrvzN2jfjf
++++
+[{"type":"paragraph","children":[{"literal":"too long @zQ3shh7B7RWHqbcFxZXwG9H9qnproDSvcCwqmSMzdwrvzN2jfjf"}]}]
++++
+Invalid char @zQ3shh7B7RWHqbcFxZXwG9H9qnproDSvcCwqmSMzdwrvzN2Of
++++
+[{"type":"paragraph","children":[{"literal":"Invalid char @zQ3shh7B7RWHqbcFxZXwG9H9qnproDSvcCwqmSMzdwrvzN2Of"}]}]
++++
+Not starting with zq3 @zq3shh7B7RWHqbcFxZXwG9H9qnproDSvcCwqmSMzdwrvzN2jf
++++
+[{"type":"paragraph","children":[{"literal":"Not starting with zq3 @zq3shh7B7RWHqbcFxZXwG9H9qnproDSvcCwqmSMzdwrvzN2jf"}]}]
