@@ -31,6 +31,10 @@ over two\n#lines test
 +++
 [{"type":"paragraph","children":[{"literal":"over two\\n"},{"type":"status-tag","literal":"lines"},{"literal":" test"}]}]
 +++
+valid #status_tag
++++
+[{"type":"paragraph","children":[{"literal":"valid "},{"type":"status-tag","literal":"status_tag"}]}]
++++
 another not valid #status?tag
 +++
 [{"type":"paragraph","children":[{"literal":"another not valid #status?tag"}]}]
