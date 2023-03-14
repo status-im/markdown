@@ -14,6 +14,10 @@ at the #end
 +++
 [{"type":"paragraph","children":[{"literal":"at the "},{"type":"status-tag","literal":"end"}]}]
 +++
+at the #_end
++++
+[{"type":"paragraph","children":[{"literal":"at the "},{"type":"status-tag","literal":"_end"}]}]
++++
 #try-two in #one-line
 +++
 [{"type":"paragraph","children":[{"literal":""},{"type":"status-tag","literal":"try-two"},{"literal":" in "},{"type":"status-tag","literal":"one-line"}]}]
@@ -27,9 +31,9 @@ over two\n#lines test
 +++
 [{"type":"paragraph","children":[{"literal":"over two\\n"},{"type":"status-tag","literal":"lines"},{"literal":" test"}]}]
 +++
-not valid #status_tag
+valid #status_tag
 +++
-[{"type":"paragraph","children":[{"literal":"not valid #status_tag"}]}]
+[{"type":"paragraph","children":[{"literal":"valid "},{"type":"status-tag","literal":"status_tag"}]}]
 +++
 another not valid #status?tag
 +++
